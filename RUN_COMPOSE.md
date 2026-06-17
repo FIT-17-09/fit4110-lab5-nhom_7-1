@@ -4,14 +4,26 @@ Prerequisites: Docker Desktop or Docker Engine with Compose v2.
 
 1. Copy `.env.example` to `.env` and set values (do NOT commit `.env`).
 
+Bash / WSL:
 ```
 cp .env.example .env
+```
+
+PowerShell:
+```
+Copy-Item .env.example .env
 ```
 
 2. Build and start the stack:
 
 ```
 make compose-up
+```
+
+If `make` is not available on Windows, use:
+
+```
+docker compose up -d --build
 ```
 
 3. Check health endpoints:
@@ -22,6 +34,12 @@ curl http://localhost:9000/health
 docker exec -it <db_container> pg_isready -U ${POSTGRES_USER}
 ```
 
+PowerShell example:
+
+```
+Invoke-RestMethod http://localhost:8000/health
+Invoke-RestMethod http://localhost:9000/health
+```
 4. Run Postman/Newman tests against `http://localhost:8000`.
 
 5. Stop and remove the stack:
