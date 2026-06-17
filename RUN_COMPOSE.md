@@ -1,3 +1,34 @@
+# RUN_COMPOSE
+
+Prerequisites: Docker Desktop or Docker Engine with Compose v2.
+
+1. Copy `.env.example` to `.env` and set values (do NOT commit `.env`).
+
+```
+cp .env.example .env
+```
+
+2. Build and start the stack:
+
+```
+make compose-up
+```
+
+3. Check health endpoints:
+
+```
+curl http://localhost:8000/health
+curl http://localhost:9000/health
+docker exec -it <db_container> pg_isready -U ${POSTGRES_USER}
+```
+
+4. Run Postman/Newman tests against `http://localhost:8000`.
+
+5. Stop and remove the stack:
+
+```
+make compose-down
+```
 # RUN_COMPOSE.md – Hướng dẫn chạy Lab 05
 
 Tài liệu này hướng dẫn người khác clone repo sạch và chạy lại stack Compose của Lab 05.

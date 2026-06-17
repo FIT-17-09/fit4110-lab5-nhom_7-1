@@ -1,3 +1,22 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Payload(BaseModel):
+    data: dict | None = None
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.post("/predict")
+def predict(payload: Payload):
+    # Dummy prediction: echo with label
+    return {"label": "dummy", "confidence": 0.5, "input": payload.data}
 """
 Simple AI service mock for Lab 05.
 

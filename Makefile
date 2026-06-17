@@ -1,3 +1,26 @@
+COMPOSE=docker compose
+
+.PHONY: compose-up compose-down logs build test-compose
+
+compose-up:
+	$(COMPOSE) up -d --build
+
+compose-down:
+	$(COMPOSE) down
+
+logs:
+	$(COMPOSE) logs -f
+
+build:
+	$(COMPOSE) build --no-cache
+
+test-compose:
+	@echo "Run Newman/Postman tests against http://localhost:${APP_PORT}"
+	@which npx || (echo "Node/npm not found; install Node.js to run tests"; exit 1)
+	# ensure reports dir exists
+	@mkdir -p reports
+	# run newman and export reporters (JUnit XML + HTML)
+	npx newman run postman/FIT4110_lab05_collection.json -e postman/environments/FIT4110_lab05_local.postman_environment.json --reporters cli,junit,html --reporter-junit-export reports/newman-lab05-compose.xml --reporter-html-export reports/newman-lab05-compose.html
 .PHONY: install lint build run compose-up compose-down logs test-compose
 
 # Install Node dependencies for Prism/Spectral/Newman

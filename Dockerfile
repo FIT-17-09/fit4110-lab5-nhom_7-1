@@ -1,3 +1,15 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY src/iot_app /app/src/iot_app
+ENV PYTHONPATH=/app
+HEALTHCHECK --interval=10s --timeout=3s CMD curl -f http://localhost:8000/health || exit 1
+RUN useradd -m appuser || true
+USER appuser
+EXPOSE 8000
+CMD ["uvicorn", "iot_app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 # syntax=docker/dockerfile:1.7
 
 FROM python:3.11-slim AS builder

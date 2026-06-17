@@ -1,3 +1,8 @@
+# FIT4110_lab05_docker_compose_readiness
+
+Repository template for Lab 05: Docker Compose readiness for multi-service stacks.
+
+See `RUN_COMPOSE.md` for how to build and run the sample stack locally.
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/hNllAWEZ)
 # FIT4110_lab05_docker_compose_readiness
 

@@ -1,9 +1,44 @@
+from fastapi import FastAPI, HTTPException
+import os
+import httpx
+
+app = FastAPI()
+
+DB_URL = os.getenv("POSTGRES_DB")
+AI_SERVICE = os.getenv("AI_SERVICE_URL", "http://ai-service:9000")
+
+
+@app.get("/health")
+async def health():
+    # Basic readiness: can we contact AI service (internal) — DB readiness checked by compose
+    try:
+        async with httpx.AsyncClient() as c:
+            r = await c.get(f"{AI_SERVICE}/health", timeout=2.0)
+            ai_ok = r.status_code == 200
+    except Exception:
+        ai_ok = False
+    return {"status": "ok", "ai": ai_ok, "db": bool(DB_URL)}
+
+
+@app.post("/readings")
+async def create_reading(payload: dict):
+    # forward data to AI service for a prediction (dummy)
+    try:
+        async with httpx.AsyncClient() as c:
+            r = await c.post(f"{AI_SERVICE}/predict", json=payload, timeout=5.0)
+            r.raise_for_status()
+            pred = r.json()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    # In a real app we'd persist to DB. Here we return combined result.
+    return {"ingested": payload, "prediction": pred}
 import os
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response, status
+import http.client
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -113,13 +148,13 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     else:
         problem = build_problem(
             status_code=exc.status_code,
-            title=status.HTTP_STATUS_CODES.get(exc.status_code, "HTTP Error"),
+            title=http.client.responses.get(exc.status_code, "HTTP Error"),
             detail=str(exc.detail),
             instance=str(request.url.path),
         )
 
     problem.setdefault("status", exc.status_code)
-    problem.setdefault("title", status.HTTP_STATUS_CODES.get(exc.status_code, "HTTP Error"))
+    problem.setdefault("title", http.client.responses.get(exc.status_code, "HTTP Error"))
     problem.setdefault("type", "about:blank")
     problem.setdefault("detail", "Request failed")
     problem.setdefault("instance", str(request.url.path))
