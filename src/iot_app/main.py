@@ -3,6 +3,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
 
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import requests
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -12,6 +15,12 @@ from pydantic import BaseModel, Field
 SERVICE_NAME = os.getenv("SERVICE_NAME", "iot-ingestion")
 SERVICE_VERSION = os.getenv("SERVICE_VERSION", "0.5.0")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN", "local-dev-token")
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_PORT = int(os.getenv("DB_PORT", "5432"))
+DB_NAME = os.getenv("POSTGRES_DB", "iotdb")
+DB_USER = os.getenv("POSTGRES_USER", "lab05")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "lab05pass")
+AI_SERVICE_URL = os.getenv("AI_SERVICE_URL", "http://ai-service:9000")
 
 
 app = FastAPI(
@@ -85,6 +94,35 @@ class SensorReadingCreated(BaseModel):
 
 
 READINGS: List[Dict] = []
+
+
+def get_db_connection():
+    return psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        cursor_factory=RealDictCursor,
+    )
+
+
+def call_ai_service(payload: Dict) -> Dict:
+    try:
+        response = requests.post(f"{AI_SERVICE_URL}/predict", json=payload, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=build_problem(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                title="AI service unavailable",
+                detail=f"Could not call AI service: {exc}",
+                instance="/readings",
+                problem_type="https://smart-campus.local/problems/service-unavailable",
+            ),
+        )
 
 
 def build_problem(
@@ -227,6 +265,43 @@ def create_reading(payload: SensorReadingCreate, response: Response) -> SensorRe
     }
     READINGS.append(item)
 
+    ai_payload = {
+        "device_id": payload.device_id,
+        "metric": payload.metric.value,
+        "value": payload.value,
+        "timestamp": payload.timestamp,
+    }
+    ai_result = call_ai_service(ai_payload)
+    response.headers["X-AI-Result"] = str(ai_result)
+
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO readings (reading_id, device_id, metric, value, unit, timestamp, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        reading_id,
+                        payload.device_id,
+                        payload.metric.value,
+                        payload.value,
+                        payload.unit.value if payload.unit else None,
+                        payload.timestamp,
+                        created_at,
+                    ),
+                )
+                conn.commit()
+    except psycopg2.Error as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=build_problem(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                title="Database error",
+                detail=str(exc),
+                instance="/readings",
+                problem_type="https://smart-campus.local/problems/database-error",
+            ),
+        )
+
     return SensorReadingCreated(
         reading_id=reading_id,
         device_id=payload.device_id,
@@ -236,24 +311,43 @@ def create_reading(payload: SensorReadingCreate, response: Response) -> SensorRe
     )
 
 
+def fetch_readings_from_db(device_id: Optional[str] = None, limit: int = 10) -> List[Dict]:
+    query = "SELECT reading_id, device_id, metric, value, unit, timestamp, created_at FROM readings"
+    params = []
+    if device_id:
+        query += " WHERE device_id = %s"
+        params.append(device_id)
+    query += " ORDER BY created_at DESC LIMIT %s"
+    params.append(limit)
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query, tuple(params))
+            return cursor.fetchall()
+
+
+def fetch_reading_by_id(reading_id: str) -> Optional[Dict]:
+    query = "SELECT reading_id, device_id, metric, value, unit, timestamp, created_at FROM readings WHERE reading_id = %s"
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (reading_id,))
+            return cursor.fetchone()
+
+
 @app.get("/readings/latest", dependencies=[Depends(verify_bearer_token)])
 def latest_readings(
     device_id: Optional[str] = Query(default=None),
     limit: int = Query(default=10, ge=1, le=100),
 ) -> Dict[str, List[Dict]]:
-    items = READINGS
-
-    if device_id:
-        items = [item for item in items if item["device_id"] == device_id]
-
-    return {"items": items[-limit:]}
+    items = fetch_readings_from_db(device_id=device_id, limit=limit)
+    return {"items": items}
 
 
 @app.get("/readings/{reading_id}", dependencies=[Depends(verify_bearer_token)])
 def get_reading(reading_id: str) -> Dict:
-    for item in READINGS:
-        if item["reading_id"] == reading_id:
-            return item
+    item = fetch_reading_by_id(reading_id)
+    if item:
+        return item
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,

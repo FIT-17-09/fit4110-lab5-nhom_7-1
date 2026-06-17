@@ -29,3 +29,7 @@ logs:
 # Run Newman tests on compose stack
 test-compose:
 	npm run test:compose
+
+# Run database init manually (if needed)
+init-db:
+	python scripts/init_db.py
