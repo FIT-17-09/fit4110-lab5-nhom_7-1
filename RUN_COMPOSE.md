@@ -75,8 +75,13 @@ npm install
 ```bash
 # Copy .env.example sang .env và chỉnh sửa nếu cần
 cp .env.example .env
+# Windows PowerShell
+# copy .env.example .env
 
-# Build images (nếu chưa có) và khởi động các container trong nền
+# Nếu mạng class-net chưa tồn tại, tạo trước
+# docker network create class-net
+
+# Build images và khởi động các container trong nền
 docker compose up -d --build
 ```
 
@@ -102,7 +107,7 @@ curl http://localhost:8000/health
 curl http://localhost:9000/health
 
 # DB readiness
-docker exec -it fit4110-db-lab05 pg_isready -U $POSTGRES_USER
+docker exec -it fit4110-db-lab05 pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
 ```
 
 Bạn cũng có thể truy cập endpoint `/predict` của AI service để xem kết quả mẫu:
