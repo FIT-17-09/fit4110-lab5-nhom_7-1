@@ -1,0 +1,261 @@
+{
+  "info": {
+    "_postman_id": "5b41c6f0-c5c3-4e6c-a3ef-b2-camera-lab04",
+    "name": "FIT4110 Lab04 Camera B2 Docker Verification",
+    "description": "Postman/Newman tests for B2 Camera Stream service packaged in Docker.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "GET /health returns service status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('health returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('health body contains status and service', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('ok');",
+                  "  pm.expect(json).to.have.property('service');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera Analyze",
+      "item": [
+        {
+          "name": "POST valid camera frame returns 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"camera_id\": \"cam-gate-01-entry\",\n  \"image_url\": \"https://example.com/images/frame.jpg\",\n  \"timestamp\": \"2026-05-22T10:30:00Z\",\n  \"correlationId\": \"corr-b2-valid-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vision/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vision", "analyze"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('valid frame is accepted', function () {",
+                  "  pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('response confirms queued frame', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('received');",
+                  "  pm.expect(json.message).to.include('Frame queued');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST without bearer token returns 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"camera_id\": \"cam-gate-01-entry\",\n  \"image_url\": \"https://example.com/images/frame.jpg\",\n  \"timestamp\": \"2026-05-22T10:30:00Z\",\n  \"correlationId\": \"corr-b2-no-auth\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vision/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vision", "analyze"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('missing token is rejected', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('error uses ProblemDetails', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.include.keys(['type', 'title', 'status', 'detail']);",
+                  "  pm.expect(json.status).to.eql(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST missing image_url returns 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"camera_id\": \"cam-gate-01-entry\",\n  \"timestamp\": \"2026-05-22T10:30:00Z\",\n  \"correlationId\": \"corr-b2-missing-image\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vision/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vision", "analyze"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('missing image_url is rejected', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('validation error uses ProblemDetails', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.include.keys(['type', 'title', 'status', 'detail']);",
+                  "  pm.expect(json.status).to.eql(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST bad image URL returns 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"camera_id\": \"cam-gate-01-entry\",\n  \"image_url\": \"not-a-url\",\n  \"timestamp\": \"2026-05-22T10:30:00Z\",\n  \"correlationId\": \"corr-b2-bad-url\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vision/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vision", "analyze"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('bad URL is rejected', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('bad URL error uses ProblemDetails', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.include.keys(['type', 'title', 'status', 'detail']);",
+                  "  pm.expect(json.status).to.eql(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST boundary large image returns 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"camera_id\": \"cam-gate-01-entry\",\n  \"image_url\": \"https://example.com/images/frame-5mb.jpg\",\n  \"timestamp\": \"2026-05-22T10:30:00Z\",\n  \"correlationId\": \"corr-b2-boundary-large\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vision/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vision", "analyze"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('large image boundary is rejected', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('large image error uses ProblemDetails', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.include.keys(['type', 'title', 'status', 'detail']);",
+                  "  pm.expect(json.status).to.eql(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

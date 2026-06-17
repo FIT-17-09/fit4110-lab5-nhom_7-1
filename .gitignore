@@ -1,28 +1,7 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-venv/
-.venv/
-
-# Environment
 .env
-.env.*
-
-# Node
+.venv/
 node_modules/
+.edge-profile/
 
-# Generated reports
-reports/
-
-# Docker
-*.log
-
-# VS Code
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
+__pycache__/
+*.pyc

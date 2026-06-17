@@ -45,6 +45,7 @@ import http.client
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from http import HTTPStatus
 
 # Đọc biến môi trường với giá trị mặc định
 SERVICE_NAME = os.getenv("SERVICE_NAME", "iot-ingestion")
@@ -184,15 +185,25 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     if isinstance(exc.detail, dict):
         problem = exc.detail
     else:
+        try:
+            title = HTTPStatus(exc.status_code).phrase
+        except ValueError:
+            title = "HTTP Error"
+
         problem = build_problem(
             status_code=exc.status_code,
-            title=http.client.responses.get(exc.status_code, "HTTP Error"),
+            title=title,
             detail=str(exc.detail),
             instance=str(request.url.path),
         )
 
+    try:
+        default_title = HTTPStatus(exc.status_code).phrase
+    except ValueError:
+        default_title = "HTTP Error"
+
     problem.setdefault("status", exc.status_code)
-    problem.setdefault("title", http.client.responses.get(exc.status_code, "HTTP Error"))
+    problem.setdefault("title", default_title)
     problem.setdefault("type", "about:blank")
     problem.setdefault("detail", "Request failed")
     problem.setdefault("instance", str(request.url.path))

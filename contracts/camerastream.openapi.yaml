@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: B2 Camera Stream Processing Contract
+  description: |
+    API contract for the B2 service that receives camera frames and queues them
+    for AI vision processing. All analyze requests require Bearer token authentication.
+  version: 1.0.0
+  contact:
+    name: Camera Stream Team
+    email: camerastream@example.com
+servers:
+  - url: http://localhost:8000
+    description: Local or Docker sandbox
+security:
+  - BearerAuth: []
+tags:
+  - name: system
+    description: Health and status
+  - name: vision
+    description: Camera frame intake and analysis queueing
+paths:
+  /api/v1/vision/analyze:
+    post:
+      tags: [vision]
+      summary: Submit a camera frame for analysis
+      description: |
+        Camera Stream sends image_url with context (camera_id, timestamp, correlationId).
+        The service validates input and responds 202 Accepted for async processing.
+      operationId: analyzeCameraFrame
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeRequest"
+      responses:
+        "202":
+          description: Accepted and queued for async processing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResponseSuccess"
+        "400":
+          description: Invalid input or image size exceeds 5MB.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          description: Unauthorized (missing or invalid token).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          description: AI Vision internal error.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      summary: Health check for AI Vision service
+      description: Public health check endpoint.
+      security: []
+      responses:
+        "200":
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: camera-stream-b2
+                  version:
+                    type: string
+                    example: "0.4.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2026-05-22T09:00:00.000Z"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token with role vision-analyzer.
+
+  schemas:
+    AnalyzeRequest:
+      type: object
+      required:
+        - camera_id
+        - image_url
+        - timestamp
+        - correlationId
+      properties:
+        camera_id:
+          type: string
+          description: Unique camera identifier.
+          example: cam-gate-01-entry
+        image_url:
+          type: string
+          format: uri
+          description: URL of image to analyze (max 5MB).
+          example: https://example.com/images/frame.jpg
+        timestamp:
+          type: string
+          format: date-time
+          description: Frame capture time in ISO 8601 UTC.
+          example: "2026-05-22T10:30:00Z"
+        correlationId:
+          type: string
+          description: Unique request id for idempotency and tracing.
+          example: corr-b2-b4-b6-9912a
+
+    AnalyzeResponseSuccess:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          example: received
+        message:
+          type: string
+          example: Frame queued for async processing.
+        camera_id:
+          type: string
+          example: cam-gate-01-entry
+        correlationId:
+          type: string
+          example: corr-b2-b4-b6-9912a
+        queued_at:
+          type: string
+          format: date-time
+          example: "2026-05-22T10:30:03Z"
+
+    ProblemDetails:
+      type: object
+      description: Error model compatible with RFC 7807 (Problem Details).
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: Link to error documentation.
+          example: https://api.smartcampus.edu.vn/errors/bad-request
+        title:
+          type: string
+          description: Short summary of the error type.
+          example: Invalid Request Payload
+        status:
+          type: integer
+          description: HTTP status code.
+          minimum: 400
+          maximum: 599
+          example: 400
+        detail:
+          type: string
+          description: Detailed error explanation.
+          example: "The field 'image_url' is required and must be a valid URI. Image size must not exceed 5MB."
+        instance:
+          type: string
+          format: uri
+          description: Request URI that caused the error.
+          example: https://api.smartcampus.edu.vn/requests/api/v1/vision/analyze

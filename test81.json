@@ -1,0 +1,7 @@
+{
+  "device_id": "ESP32",
+  "metric": "temperature",
+  "value": 81,
+  "unit": "celsius",
+  "timestamp": "2026-06-17T08:00:00+07:00"
+}

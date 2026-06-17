@@ -1,5 +1,262 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="FIT4110 Lab05 Collection" tests="2" time="0.036">
-  <testsuite name="Health API" id="4c7133e0-eaed-4a20-863a-2261c168514d" timestamp="2026-06-17T02:18:36.531Z" tests="0" failures="0" errors="0" time="0.027"/>
-  <testsuite name="Create reading (predict)" id="b1b87a54-fade-464e-9570-f12d8ac58667" timestamp="2026-06-17T02:18:36.531Z" tests="0" failures="0" errors="0" time="0.009"/>
+<testsuites name="FIT4110 Lab04 IoT Docker Verification" tests="11" time="0.088">
+  <testsuite name="01_Functional / GET health returns 200" id="8399ccfe-c486-4d58-b5e6-11df2abc3e30" timestamp="2026-06-17T01:17:09.954Z" tests="3" failures="0" errors="0" time="0.022">
+    <testcase name="Status code is 200" time="0.022" classname="01FunctionalGetHealthReturns200"/>
+    <testcase name="Response has status ok" time="0.022" classname="01FunctionalGetHealthReturns200"/>
+    <testcase name="Response has service name and version" time="0.022" classname="01FunctionalGetHealthReturns200"/>
+  </testsuite>
+  <testsuite name="01_Functional / POST valid temperature reading returns 201" id="6245d0d4-8365-402e-8d8f-723d244fbda0" timestamp="2026-06-17T01:17:09.954Z" tests="3" failures="3" errors="1" time="0.005">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Status code is 201" time="0.005" classname="01FunctionalPostValidTemperatureReadingReturns201">
+      <failure type="AssertionFailure" message="expected response to have status code 201 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / POST valid temperature reading returns 201.]]>
+        <![CDATA[Test description: Status code is 201.]]>
+        <![CDATA[Error message: expected response to have status code 201 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 201 but got 500
+   at Object.eval sandbox-script.js:1:2).]]>
+      </failure>
+    </testcase>
+    <testcase name="Response follows created-reading schema" time="0.005" classname="01FunctionalPostValidTemperatureReadingReturns201">
+      <failure type="AssertionFailure" message="Unexpected token 'I' at 1:1&#xA;Internal Server Error&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / POST valid temperature reading returns 201.]]>
+        <![CDATA[Test description: Response follows created-reading schema.]]>
+        <![CDATA[Error message: Unexpected token 'I' at 1:1
+Internal Server Error
+^.]]>
+        <![CDATA[Stacktrace: JSONError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+   at Object.eval sandbox-script.js:2:2).]]>
+      </failure>
+    </testcase>
+    <testcase name="Response device_id matches request" time="0.005" classname="01FunctionalPostValidTemperatureReadingReturns201">
+      <failure type="AssertionFailure" message="Unexpected token 'I' at 1:1&#xA;Internal Server Error&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / POST valid temperature reading returns 201.]]>
+        <![CDATA[Test description: Response device_id matches request.]]>
+        <![CDATA[Error message: Unexpected token 'I' at 1:1
+Internal Server Error
+^.]]>
+        <![CDATA[Stacktrace: JSONError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+   at Object.eval sandbox-script.js:3:2).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="01_Functional / GET latest readings returns items array" id="c3addb44-f76f-4333-928c-172b1cf88ed5" timestamp="2026-06-17T01:17:09.954Z" tests="2" failures="2" errors="0" time="0.008">
+    <testcase name="Status code is 200" time="0.008" classname="01FunctionalGetLatestReadingsReturnsItemsArray">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / GET latest readings returns items array.]]>
+        <![CDATA[Test description: Status code is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 500
+   at Object.eval sandbox-script.js:1:3).]]>
+      </failure>
+    </testcase>
+    <testcase name="Response has items array" time="0.008" classname="01FunctionalGetLatestReadingsReturnsItemsArray">
+      <failure type="AssertionFailure" message="Unexpected token 'I' at 1:1&#xA;Internal Server Error&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / GET latest readings returns items array.]]>
+        <![CDATA[Test description: Response has items array.]]>
+        <![CDATA[Error message: Unexpected token 'I' at 1:1
+Internal Server Error
+^.]]>
+        <![CDATA[Stacktrace: JSONError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+   at Object.eval sandbox-script.js:2:3).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="01_Functional / GET reading by saved reading_id returns 200" id="1867ebac-0067-424e-989a-bbd9a548a785" timestamp="2026-06-17T01:17:09.954Z" tests="2" failures="2" errors="0" time="0.008">
+    <testcase name="Status code is 200" time="0.008" classname="01FunctionalGetReadingBySavedReadingIdReturns200">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / GET reading by saved reading_id returns 200.]]>
+        <![CDATA[Test description: Status code is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 500
+   at Object.eval sandbox-script.js:1:4).]]>
+      </failure>
+    </testcase>
+    <testcase name="Response reading_id matches saved variable" time="0.008" classname="01FunctionalGetReadingBySavedReadingIdReturns200">
+      <failure type="AssertionFailure" message="Unexpected token 'I' at 1:1&#xA;Internal Server Error&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 01_Functional / GET reading by saved reading_id returns 200.]]>
+        <![CDATA[Test description: Response reading_id matches saved variable.]]>
+        <![CDATA[Error message: Unexpected token 'I' at 1:1
+Internal Server Error
+^.]]>
+        <![CDATA[Stacktrace: JSONError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+   at Object.eval sandbox-script.js:2:4).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="02_Auth / POST reading without token returns 401" id="f2ae8d5c-c011-41c2-9d15-b9393489b8bf" timestamp="2026-06-17T01:17:09.954Z" tests="1" failures="1" errors="1" time="0.007">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Missing token returns 401" time="0.007" classname="02AuthPostReadingWithoutTokenReturns401">
+      <failure type="AssertionFailure" message="expected response to have status code 401 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 02_Auth / POST reading without token returns 401.]]>
+        <![CDATA[Test description: Missing token returns 401.]]>
+        <![CDATA[Error message: expected response to have status code 401 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 401 but got 500
+   at Object.eval sandbox-script.js:1:5).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="02_Auth / POST reading with wrong token returns 401" id="4d9c2e88-2ed7-4036-b246-c36216d43ba5" timestamp="2026-06-17T01:17:09.954Z" tests="1" failures="1" errors="1" time="0.007">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Wrong token returns 401" time="0.007" classname="02AuthPostReadingWithWrongTokenReturns401">
+      <failure type="AssertionFailure" message="expected response to have status code 401 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 02_Auth / POST reading with wrong token returns 401.]]>
+        <![CDATA[Test description: Wrong token returns 401.]]>
+        <![CDATA[Error message: expected response to have status code 401 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 401 but got 500
+   at Object.eval sandbox-script.js:1:6).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="03_Negative / POST reading missing device_id returns validation error" id="00659e3b-33e3-41c7-92b6-d4cb0e30fbf3" timestamp="2026-06-17T01:17:09.954Z" tests="1" failures="1" errors="1" time="0.006">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Missing required field returns 422" time="0.006" classname="03NegativePostReadingMissingDeviceIdReturnsValidationError">
+      <failure type="AssertionFailure" message="expected response to have status code 422 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 03_Negative / POST reading missing device_id returns validation error.]]>
+        <![CDATA[Test description: Missing required field returns 422.]]>
+        <![CDATA[Error message: expected response to have status code 422 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 422 but got 500
+   at Object.eval sandbox-script.js:1:7).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="03_Negative / POST reading with value as string returns validation error" id="e18055ce-14d2-4701-8f33-b9a6ed0b5408" timestamp="2026-06-17T01:17:09.954Z" tests="1" failures="1" errors="1" time="0.006">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Wrong data type returns 422" time="0.006" classname="03NegativePostReadingWithValueAsStringReturnsValidationError">
+      <failure type="AssertionFailure" message="expected response to have status code 422 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 03_Negative / POST reading with value as string returns validation error.]]>
+        <![CDATA[Test description: Wrong data type returns 422.]]>
+        <![CDATA[Error message: expected response to have status code 422 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 422 but got 500
+   at Object.eval sandbox-script.js:1:8).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / POST boundary temperature 80 is accepted with warning" id="0ce20770-127e-4d6a-a86c-f4b9a328b5cc" timestamp="2026-06-17T01:17:09.954Z" tests="2" failures="2" errors="0" time="0.008">
+    <testcase name="Boundary value 80 returns 201" time="0.008" classname="04BoundaryReliabilityPostBoundaryTemperature80IsAcceptedWithWarning">
+      <failure type="AssertionFailure" message="expected response to have status code 201 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 04_Boundary_Reliability / POST boundary temperature 80 is accepted with warning.]]>
+        <![CDATA[Test description: Boundary value 80 returns 201.]]>
+        <![CDATA[Error message: expected response to have status code 201 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 201 but got 500
+   at Object.eval sandbox-script.js:1:9).]]>
+      </failure>
+    </testcase>
+    <testcase name="High temperature response includes warning header" time="0.008" classname="04BoundaryReliabilityPostBoundaryTemperature80IsAcceptedWithWarning">
+      <failure type="AssertionFailure" message="expected false to deeply equal true">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 04_Boundary_Reliability / POST boundary temperature 80 is accepted with warning.]]>
+        <![CDATA[Test description: High temperature response includes warning header.]]>
+        <![CDATA[Error message: expected false to deeply equal true.]]>
+        <![CDATA[Stacktrace: AssertionError: expected false to deeply equal true
+   at Object.eval sandbox-script.js:2:9).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / POST boundary temperature 81 is rejected" id="bab9f7a6-a709-4a27-a1b6-62ea157bfdb9" timestamp="2026-06-17T01:17:09.954Z" tests="1" failures="1" errors="1" time="0.006">
+    <system-err><![CDATA[Iteration: 0
+
+---
+testScriptError: Unexpected token 'I' at 1:1
+Internal Server Error
+^
+---
+]]></system-err>
+    <testcase name="Boundary value 81 returns 422" time="0.006" classname="04BoundaryReliabilityPostBoundaryTemperature81IsRejected">
+      <failure type="AssertionFailure" message="expected response to have status code 422 but got 500">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: c306d369-ccbd-4eb8-ad7d-bf5fd50a3709.]]>
+        <![CDATA[Collection name: FIT4110 Lab04 IoT Docker Verification.]]>
+        <![CDATA[Request name: 04_Boundary_Reliability / POST boundary temperature 81 is rejected.]]>
+        <![CDATA[Test description: Boundary value 81 returns 422.]]>
+        <![CDATA[Error message: expected response to have status code 422 but got 500.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 422 but got 500
+   at Object.eval sandbox-script.js:1:10).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / GET health responds under 1000ms on local/container" id="bd08d730-1f58-472c-8722-24f0f0962aaf" timestamp="2026-06-17T01:17:09.954Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="Response time is below 1000ms" time="0.005" classname="04BoundaryReliabilityGetHealthRespondsUnder1000MsOnLocalContainer"/>
+    <testcase name="Health endpoint is reachable" time="0.005" classname="04BoundaryReliabilityGetHealthRespondsUnder1000MsOnLocalContainer"/>
+  </testsuite>
 </testsuites>
